@@ -1,3 +1,5 @@
+import sys
+
 empty_list = []
 light_dict = {
     0: '0,0,1,0',
@@ -9,7 +11,7 @@ light_dict = {
 color_dict = {}
 value_dict = {
 }
-#                    inputs         green,    yellow,   red,    green_left,   no_light
+#                    inputs          green,   yellow,   red,    green_left,   no_light
 transition_table = {'start' :      ['green', 'yellow', 'red',  'green_left', 'no_light'],
                     'green':       ['green', 'yellow1','nope', 'nope',       'no_light1'],
                     'yellow':      ['green', 'yellow', 'red',  'green_left', 'nope'],
@@ -22,38 +24,53 @@ transition_table = {'start' :      ['green', 'yellow', 'red',  'green_left', 'no
                     'yellow2':     ['green', 'yellow2','nope', 'green_left', 'nope'],
                     'nope':        ['nope',  'nope',   'nope', 'nope',       'nope' ],
                     }
-
-file = open('data.txt', 'r')
-for x in file:
-    empty_list.append(x[0:-1])          # removing the newline(\n) symbol.
-
+# filename = sys.argv[1]                                      # command line input
+filename = input('Input filename with .txt extension: ')      # user input
+def open_file(filename):
+        file = open(f'{filename}', 'r')
+        for x in file:
+            empty_list.append(x[0:-1])                        # removing the newline(\n) symbol
 # print(empty_list)
+
+
 def get_key(val):
     for key, value in light_dict.items():
          if val == value:
              return key
 
 
-def create_dict():                      # creating a nested dictionary
-    index = 0                           # giving every input an index
+def create_dict():                                           # creating a nested dictionary
+    index = 0                                                # giving every input an index
     for value in empty_list:
         value_dict[index] = {}  
         value_dict[index]['color'] = get_key(value) 
         value_dict[index]['value'] = value
         index += 1
-create_dict()
+# create_dict()
+
+def validate():
+    state = 'start'
+    for i in value_dict:
+        print('----')
+        print(f'step: {i}')
+        print('color indexas: ',value_dict[i]['color'])
+        print(f'current state: {state}')
+        print('color: ', transition_table[state][value_dict[i]['color']])
+        state = transition_table[state][value_dict[i]['color']]
+        if (state == 'nope'):
+            print('invalid light sequence')
+            break
+    if (state != 'nope'):
+        print('sequence is valid!')
+# validate()
 
 
-state = 'start'
-for i in value_dict:
-    print('----')
-    print(f'step: {i}')
-    print('color indexas: ',value_dict[i]['color'])
-    print(f'current state: {state}')
-    print('color: ', transition_table[state][value_dict[i]['color']])
-    state = transition_table[state][value_dict[i]['color']]
-    if (state == 'nope'):
-        print('invalid light sequence')
-        break
-if (state != 'nope'):
-    print('sequence is valid!')
+try:
+    open_file(filename)
+except FileNotFoundError:
+    print('No such file')
+except Exception as e:
+    print(e)
+else:
+    create_dict()
+    validate()
