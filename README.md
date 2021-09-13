@@ -1,1 +1,3 @@
 # TraficLightTask
+
+State machine solution
